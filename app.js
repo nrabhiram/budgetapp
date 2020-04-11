@@ -140,7 +140,8 @@ var UIController = (function() {
         expenseLabel: '.budget__expenses--value',
         percentageLabel: '.budget__expenses--percentage',
         container: '.container',
-        expensePercentageLabel: '.item__percentage'
+        expensePercentageLabel: '.item__percentage',
+        dateLabel: '.budget__title--month'
     };
 
     var formatNumber = function(num, type) {
@@ -157,6 +158,12 @@ var UIController = (function() {
 
         return (type === 'exp'? '-' : '+') + ' ' + int + '.' + dec;
     };
+
+    var nodeListForEach = function(list, callback) {
+        for (var i = 0; i < list.length; i++) {
+            callback(list[i], i);
+        };
+    }
 
     return {
         getInput: function() {
@@ -228,12 +235,6 @@ var UIController = (function() {
         displayPercentage: function(percentages) {
             var fields = document.querySelectorAll(DOMstrings.expensePercentageLabel);
 
-            var nodeListForEach = function(list, callback) {
-                for (var i = 0; i < list.length; i++) {
-                    callback(list[i], i);
-                };
-            }
-
             nodeListForEach(fields, function(current, index) {
                 if (percentages[index] > 0) {
                     current.textContent = percentages[index] + '%';
@@ -241,6 +242,26 @@ var UIController = (function() {
                     current.textContent = '---';
                 }
             });
+        },
+
+        displayMonth: function() {
+            var now = new Date();
+            var year = now.getFullYear();
+            var month = now.getMonth();
+            months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.querySelector(DOMstrings.dateLabel).textContent = months[month] + ' ' + year;
+        },
+
+        changedType: function() {
+            var fields = document.querySelectorAll(
+                DOMstrings.inputType + ',' +
+                DOMstrings.inputDescription + ',' +
+                DOMstrings.inputValue
+            );
+            nodeListForEach(fields, function(cur) {
+                cur.classList.toggle('red-focus');
+            });
+            document.querySelector(DOMstrings.inputBtn).classList.toggle('red');
         }
     }
 })();
@@ -316,6 +337,7 @@ var controller = (function(budgetCtrl, UICtrl) {
             }
         });
         document.querySelector(DOM.container).addEventListener('click', ctrlDeleteItem);
+        document.querySelector(DOM.inputType).addEventListener('change', UICtrl.changedType);
     };
 
     return {
@@ -326,7 +348,8 @@ var controller = (function(budgetCtrl, UICtrl) {
                 totalInc: 0,
                 totalExp: 0,
                 percentage: -1
-            })
+            });
+            UICtrl.displayMonth();
             console.log('The application has started.');
         }
     }
