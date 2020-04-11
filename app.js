@@ -143,6 +143,21 @@ var UIController = (function() {
         expensePercentageLabel: '.item__percentage'
     };
 
+    var formatNumber = function(num, type) {
+        num = Math.abs(num);
+        num = num.toFixed(2);
+        var numSplit = num.split('.');
+        var int = numSplit[0];
+
+        if (int.length > 3) {
+            var int = int.substr(0, int.legth - 3) + ',' + int.substr(int.length - 3, 3);
+        }
+
+        var dec = numSplit[1];
+
+        return (type === 'exp'? '-' : '+') + ' ' + int + '.' + dec;
+    };
+
     return {
         getInput: function() {
             return {
@@ -171,7 +186,7 @@ var UIController = (function() {
             // Replace Placeholder text with actual data
             newHtml = html.replace('%id%', obj.id);
             newHtml = newHtml.replace('%description%', obj.description);
-            newHtml = newHtml.replace('%value%', obj.value);
+            newHtml = newHtml.replace('%value%', formatNumber(obj.value, type));
 
             // Insert the HTML into the DOM
             document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
@@ -191,9 +206,12 @@ var UIController = (function() {
         },
 
         displayBudget: function(obj) {
-            document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget;
-            document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalInc;
-            document.querySelector(DOMstrings.expenseLabel).textContent = obj.totalExp;
+            var type;
+            obj.budget > 0? type === 'inc': type === 'exp';
+
+            document.querySelector(DOMstrings.budgetLabel).textContent = formatNumber(obj.budget, type);
+            document.querySelector(DOMstrings.incomeLabel).textContent = formatNumber(obj.totalInc, 'inc');
+            document.querySelector(DOMstrings.expenseLabel).textContent = formatNumber(obj.totalExp, 'exp');
 
             if (obj.percentage > 0) {
                 document.querySelector(DOMstrings.percentageLabel).textContent = obj.percentage + '%';
