@@ -150,7 +150,7 @@ var UIController = (function() {
         var int = numSplit[0];
 
         if (int.length > 3) {
-            var int = int.substr(0, int.legth - 3) + ',' + int.substr(int.length - 3, 3);
+            var int = int.substr(0, int.length - 3) + ',' + int.substr(int.length - 3, 3);
         }
 
         var dec = numSplit[1];
